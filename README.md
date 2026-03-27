@@ -231,7 +231,13 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+*..Les données sont stockées uniquement dans les volumes persistants.
+Donc si on perd :
+- le PVC pra-data (données de production)
+- le PVC pra-backup (sauvegardes)
+…alors on perd réellement les données.
+Le reste (pods, jobs, déploiements) peut être recréé sans impact.
+..*
 
 **Exercice 2 :**  
 Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
