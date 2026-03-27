@@ -231,27 +231,53 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+*- le PVC pra-data (données de production)
+- le PVC pra-backup (sauvegardes)
+*
 
 **Exercice 2 :**  
 Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
   
-*..Répondez à cet exercice ici..*
+*Parce que les sauvegardes étaient stockées ailleurs : dans le PVC pra-backup.
+Même si pra-data a été supprimé, les données existaient encore dans le volume de backup.
+Le Job de restauration a simplement recopié ces fichiers dans un nouveau pra-data
+*
 
 **Exercice 3 :**  
 Quels sont les RTO et RPO de cette solution ?  
   
-*..Répondez à cet exercice ici..*
+*- RTO (temps pour remettre le service en ligne) :
+Quelques minutes, le temps de recréer l’infra et lancer le job de restauration.
+- RPO (quantité de données qu’on accepte de perdre) :
+L’intervalle du CronJob.
+Si la sauvegarde tourne toutes les 5 minutes → RPO = 5 minutes.
+*
 
 **Exercice 4 :**  
 Pourquoi cette solution (cet atelier) ne peux pas être utilisé dans un vrai environnement de production ? Que manque-t-il ?   
   
-*..Répondez à cet exercice ici..*
+*Parce qu’elle est trop simple.
+Il manque :
+- une vraie base de données (SQLite n’est pas fait pour la prod)
+- un stockage répliqué et hautement disponible
+- des sauvegardes professionnelles (rotation, chiffrement, monitoring)
+- de la supervision (logs, métriques, alertes)
+- de la haute disponibilité (plusieurs replicas, load balancer)
+C’est parfait pour apprendre, mais insuffisant pour un environnement critique
+*
   
 **Exercice 5 :**  
 Proposez une archtecture plus robuste.   
   
-*..Répondez à cet exercice ici..*
+*Une architecture de production pourrait inclure :
+- PostgreSQL ou MySQL en haute disponibilité
+- un stockage distribué (Ceph, Longhorn, EBS, Azure Disk…)
+- Velero pour les sauvegardes Kubernetes
+- plusieurs replicas de l’application + un Ingress Controller
+- un système de logs et métriques (Grafana, Prometheus, Loki)
+- des sauvegardes chiffrées et externalisées (S3, Azure Blob…)
+Bref : une architecture pensée pour résister aux pannes et garantir la continuité.
+*
 
 ---------------------------------------------------
 Séquence 6 : Ateliers  
