@@ -1,9 +1,11 @@
 import os
 import sqlite3
+import time
 from datetime import datetime
 from flask import Flask, jsonify, request
 
 DB_PATH = os.getenv("DB_PATH", "/data/app.db")
+BACKUP_DIR = "/backup"
 
 app = Flask(__name__)
 
@@ -25,13 +27,31 @@ def init_db():
     conn.commit()
     conn.close()
 
+# ---------- Backup helpers ----------
+def get_last_backup_file():
+    if not os.path.isdir(BACKUP_DIR):
+        return None
+    files = os.listdir(BACKUP_DIR)
+    if not files:
+        return None
+    files.sort()
+    return files[-1]
+
+def get_backup_age_seconds(filename):
+    if not filename:
+        return None
+    full_path = os.path.join(BACKUP_DIR, filename)
+    if not os.path.exists(full_path):
+        return None
+    mtime = os.path.getmtime(full_path)
+    return int(time.time() - mtime)
+
 # ---------- Routes ----------
 
 @app.get("/")
 def hello():
     init_db()
     return jsonify(status="Bonjour tout le monde !")
-
 
 @app.get("/health")
 def health():
@@ -88,6 +108,26 @@ def count():
 
     return jsonify(count=n)
 
+# ---------- /status ----------
+@app.get("/status")
+def status():
+    init_db()
+
+    # count
+    conn = get_conn()
+    cur = conn.execute("SELECT COUNT(*) FROM events")
+    count = cur.fetchone()[0]
+    conn.close()
+
+    # backup info
+    last_backup_file = get_last_backup_file()
+    backup_age_seconds = get_backup_age_seconds(last_backup_file)
+
+    return jsonify(
+        count=count,
+        last_backup_file=last_backup_file,
+        backup_age_seconds=backup_age_seconds
+    )
 # ---------- Main ----------
 if __name__ == "__main__":
     init_db()
