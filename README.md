@@ -231,27 +231,44 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+Les données sont stockées uniquement dans les volumes persistants.
+Donc si on perd :
+- le PVC pra-data (données de production)
+- le PVC pra-backup (sauvegardes)
+…alors on perd réellement les données.
+Le reste (pods, jobs, déploiements) peut être recréé sans impact.
+
 
 **Exercice 2 :**  
 Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
   
-*..Répondez à cet exercice ici..*
+Pourquoi nous n'avons pas perdu les données lors de la suppression du PVC  ?
+Parce que les sauvegardes étaient stockées dans le PVC .
+Le job de restauration a simplement recopié ces fichiers dans un nouveau 
 
 **Exercice 3 :**  
 Quels sont les RTO et RPO de cette solution ?  
   
-*..Répondez à cet exercice ici..*
+	RTO : quelques minutes (temps de recréer l’infra + lancer la restauration)
+  RPO : égal à l’intervalle du CronJob (ex : 5 minutes)
 
 **Exercice 4 :**  
 Pourquoi cette solution (cet atelier) ne peux pas être utilisé dans un vrai environnement de production ? Que manque-t-il ?   
   
-*..Répondez à cet exercice ici..*
+Pourquoi cette solution ne peut pas être utilisée en production ?
+Parce qu’elle est trop simple.
+Il manque une vraie base de données, un stockage répliqué, des sauvegardes professionnelles, de la supervision et de la haute disponibilité.
   
 **Exercice 5 :**  
 Proposez une archtecture plus robuste.   
   
-*..Répondez à cet exercice ici..*
+Proposez une architecture plus robuste.
+• 	Base de données HA (PostgreSQL/MySQL)
+• 	Stockage distribué (Ceph, Longhorn, EBS…)
+• 	Sauvegardes avec Velero
+• 	Plusieurs replicas + Ingress Controller
+• 	Logs et métriques (Grafana, Prometheus, Loki)
+• 	Sauvegardes chiffrées et externalisées (S3, Azure Blob
 
 ---------------------------------------------------
 Séquence 6 : Ateliers  
